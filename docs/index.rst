@@ -18,7 +18,9 @@
 
 API documentation
 =================
-
+.. automodule:: dkconfig.dkconfig
+   :members:
+   :undoc-members:
 
 
 Indices and tables

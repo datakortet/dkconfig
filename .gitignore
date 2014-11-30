@@ -54,3 +54,5 @@ docs/_build/
 target/
 *.py~
 *.rst~
+
+README.html

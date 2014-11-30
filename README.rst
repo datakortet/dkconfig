@@ -1,6 +1,7 @@
 
-.. image:: https://travis-ci.org/thebjorn/dkconfig.svg?branch=master
-    :target: https://travis-ci.org/thebjorn/dkconfig
+..
+  image:: https://travis-ci.org/thebjorn/dkconfig.svg?branch=master
+  :target: https://travis-ci.org/thebjorn/dkconfig
 
 
 dkconfig -- short description
