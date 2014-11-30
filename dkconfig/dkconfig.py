@@ -217,6 +217,7 @@ def piped_input():
     "Do we have piped input?"
     if sys.platform == 'win32':
         return []
+    return []       # TODO: find a way to use both py.test capsys and select on sys.stdin..
     import select
 
     ready, _, _ = select.select([sys.stdin], [], [], 0)
