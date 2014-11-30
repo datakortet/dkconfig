@@ -38,8 +38,12 @@ setup(
     version=version,
     license='MIT',
     url='https://github.com/datakortet/dkconfig',
-    requires=[],
-    install_requires=['lockfile', 'mock'],
+    requires=[
+        'lockfile>=0.10.2',
+        'pathlib>=1',
+        #'six>=1.7.3'
+    ],
+    install_requires=[],
     description=__doc__.strip(),
     classifiers=[line for line in classifiers.split('\n') if line],
     long_description=open('README.rst').read(),
