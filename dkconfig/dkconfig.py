@@ -262,10 +262,9 @@ def parse_commandline(arguments=None):
     return fnames, command, args, progflags
 
 
-def main(cmdline=""):
+def main(cmdline=None):
     params = cmdline.split() if isinstance(cmdline, basestring) else sys.argv[1:]
     fnames, command, args, flags = parse_commandline(params)
-    #print(locals())
     retcode = 0
 
     for fname in fnames:
