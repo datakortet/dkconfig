@@ -1,7 +1,6 @@
-
---index-url https://pypi.python.org/simple/
--e .
-
+# from setup.py
+lockfile>=0.10.2
+pathlib>=1
 
 pep8>=1.0.1
 pylint>=0.25.1
