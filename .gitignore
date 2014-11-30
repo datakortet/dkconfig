@@ -56,3 +56,5 @@ target/
 *.rst~
 
 README.html
+
+pypi-docs.zip

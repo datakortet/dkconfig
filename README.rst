@@ -1,7 +1,10 @@
 
-..
-  image:: https://travis-ci.org/thebjorn/dkconfig.svg?branch=master
-  :target: https://travis-ci.org/thebjorn/dkconfig
+.. image:: https://travis-ci.org/datakortet/dkconfig.svg?branch=master
+  :target: https://travis-ci.org/datakortet/dkconfig
+
+.. image:: https://readthedocs.org/projects/dkconfig/badge/?version=latest
+   :target: https://readthedocs.org/projects/dkconfig/?badge=latest
+   :alt: Documentation Status
 
 
 dkconfig -- short description
