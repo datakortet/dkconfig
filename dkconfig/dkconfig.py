@@ -234,6 +234,11 @@ def parse_commandline(arguments=None):
         arguments = sys.argv[1:]
     progargs = [a for a in arguments if not a.startswith('-')]
     progflags = [f for f in arguments if f.startswith('-')]
+    if '--version' in progflags:
+        from .version import __version__
+        print(__version__)
+        sys.exit(0)
+        
     argcount = len(progargs)
 
     def getarg(n, default=None):

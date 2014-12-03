@@ -58,3 +58,4 @@ target/
 README.html
 
 pypi-docs.zip
+.idea/workspace.xml
