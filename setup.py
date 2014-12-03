@@ -16,7 +16,7 @@ Topic :: Software Development :: Libraries
 
 from setuptools import setup, Command
 
-version = '0.1.2'
+version = '0.1.3'
 
 
 class PyTest(Command):
