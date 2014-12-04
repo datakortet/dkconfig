@@ -184,7 +184,7 @@ class Config(configparser.RawConfigParser):
 @contextmanager
 def parser(fname):
     cp = Config()
-    lock = LockFile(fname + '.lock')
+    lock = LockFile(fname + '.lock', timeout=2)
     with lock:
         try:
             cp.read(fname)
