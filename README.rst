@@ -7,6 +7,11 @@
    :alt: Documentation Status
 
 
+.. image:: https://coveralls.io/repos/datakortet/dkconfig/badge.png
+   :target: https://coveralls.io/r/datakortet/dkconfig
+   :alt: Coverage Status
+
+
 dkconfig -- short description
 ==================================================
 
