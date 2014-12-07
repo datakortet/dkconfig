@@ -11,6 +11,14 @@ def sysexit(monkeypatch):
     return mock_exit
 
 
+def test_debug(sysexit, capsys):
+    main("foo.ini get header key -d")
+    #sysexit.assert_called_with(0)
+    out, err = capsys.readouterr()
+    print err[50:]
+    assert err == """ARGS: Namespace(command='get', debug=True, filename=['foo.ini'], version=False) ['header', 'key']\n"""
+    
+
 def test_create_file(tmpdir, sysexit):
     assert len(tmpdir.listdir()) == 0
     main("%s set header key value" % tmpdir.join("foo.ini"))
@@ -98,8 +106,25 @@ def test_add_duplicate_section(tmpdir, sysexit, capsys):
     assert out.strip() == ""
 
 
-# def test_help(tmpdir, sysexit, capsys):
-#     main("help")
-#     sysexit.assert_called_with(0)
-#     out, err = capsys.readouterr()
-#     assert out == dkconfig.__doc__
+def test_help(tmpdir, sysexit, capsys):
+    main("help")
+    sysexit.assert_called_with(0)
+    out, err = capsys.readouterr()
+    assert 'add_section' in out
+    assert 'set' in out
+    assert 'get' in out
+    assert 'items' in out
+    assert 'dos' in out
+    assert 'bash' in out
+    assert 'cat' in out
+    assert 'values' in out
+    assert 'write' in out
+
+
+def test_help_command(tmpdir, sysexit, capsys):
+    main("help values")
+    sysexit.assert_called_with(0)
+    out, err = capsys.readouterr()
+    print 'out:', repr(out)
+    print 'docstring', repr(dkconfig.Config.values.__doc__)
+    assert dkconfig.Config.values.__doc__ in out

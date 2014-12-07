@@ -4,12 +4,17 @@ from __future__ import print_function
 import inspect
 import sys
 import glob
+import tempfile
+import os
 import re
+import argparse
+
 
 __doc__ = """
 Basic usage
 -----------
-Most of the methods of ConfigParser (https://docs.python.org/2/library/configparser.html#ConfigParser.RawConfigParser)
+Most of the methods of ConfigParser
+(https://docs.python.org/2/library/configparser.html#ConfigParser.RawConfigParser)
 should be usable in a relatively obvious way, however, ``dkconfig`` tries to
 give you some sane defaults to make your life easier, e.g. it will create
 files/headers/keys that don't exist::
@@ -47,16 +52,17 @@ the ``dos`` command will output the key/values as dos ``set`` commands::
 
     /tst> dkconfig foo.ini dos
     set "KEY=value"
-    /tst> dkconfig foo.ini dos > tmp.bat && tmp.bat
-    /tst> echo %KEY%
-    value
 
-the ``bash`` command does the same for bash::
+from a batch file you would use it like this::
 
-    /tst> dkconfig foo.ini bash
-    export KEY="value"
+    dkconfig foo.ini dos > tmp.bat && call tmp.bat && del tmp.bat
 
-You can read values directly into dos variables in the regular convuluted way::
+the ``bash`` command does the same for bash, and you'll use it together with
+eval::
+
+    eval $(dkconfig foo.ini bash)
+
+You can read values directly into dos variables in the regular way::
 
     /tst> for /f "delims=" %a in ('dkconfig foo.ini get header key') do @set KEY=%a
     /tst> echo %KEY%
@@ -81,47 +87,86 @@ The appropriate error returns are set if a key is missing::
 """
 try:
     import ConfigParser as configparser
-except ImportError:
+except ImportError:  # pragma: no cover
     import configparser
 from contextlib import contextmanager
 from lockfile import LockFile
 
 
-def _printres(val):
-    if val is None:
-        print("")
-        return
-    if isinstance(val, list):
-        if not val:
-            print("")
-            return
-        first = val[0]
-        if isinstance(first, tuple):
-            keylen = max(len(k) for k, v in val)
-            for item in val:
-                print(item[0].ljust(keylen), '=>', item[1])
-        else:
-            for item in val:
-                print(item)
-    else:
-        print(val)
+def _is_items(lst):
+    try:
+        return [(a,b) for a,b in lst]
+    except ValueError:
+        return False
+
+def _is_iter(lst):
+    try:
+        return list(lst)
+    except:
+        return False
+
+
+def format_items(items):
+    keylen = max(len(k) for k, v in items)
+    for k, v in items:
+        print(k.ljust(keylen), '=>', v)
+    
+def format_list(lst):
+    for item in lst:
+        print(item)
+
+
+def format_result(val):
+    if not val:
+        return print("")
+
+    if isinstance(val, (int, float, str, unicode)):
+        return print(val)
+    
+    items = _is_items(val)
+    if items:
+        return format_items(items)
+    
+    lst = _is_iter(val)
+    if lst:
+        return format_list(lst)
+        
+    print(val)
 
 
 class Config(configparser.RawConfigParser):
     exit = 0
+    _meta_commands = ['help']
 
-    def help(self, cmdname=None):
+    @property
+    def commands(self):
+        return [name for name in dir(self)
+                if name != 'commands' and not name.startswith('_')
+                and inspect.ismethod(getattr(self, name))]
+
+    def help(self, cmdname=None, **kw):
         """List all commands, or help foo to get help on foo.
         """
-        cmds = [name for name in dir(self)
-                if not name.startswith('_')
-                and inspect.ismethod(getattr(self, name))]
+        cmds = self.commands
+
         if cmdname is None or cmdname not in cmds:
-            return cmds
+            return [' ' * 4 + cmd for cmd in cmds]
 
         firstline = inspect.getsourcelines(getattr(self, cmdname))[0][0]
         docstring = inspect.getdoc(getattr(self, cmdname))
-        return firstline.strip() + '\n\n' + docstring
+        return '''
+        %s
+            """
+            %s
+            """''' % (firstline.strip(), docstring)
+
+    def cat(self):
+        "Output the contents to stdout."
+        self.write(sys.stdout)
+
+    def read(self, fname, *args, **kw):
+        open(fname, 'a+').close()  # create file if it doesn't exist.
+        return configparser.RawConfigParser.read(self, fname, *args, **kw)
 
     def add_section(self, section):
         "Silently accept existing sections."
@@ -170,8 +215,6 @@ class Config(configparser.RawConfigParser):
                 # it's a path
                 return v.replace('/', '\\')
             return v
-            # print("converting:", v, type(v))
-            # return re.sub(r'\$(.*)\b', r"%%\1%%", v, re.I)
 
         return ['set "%s=%s"' % (k.upper(), convert_val(v))
                 for k, v in self.values(*sections)]
@@ -181,11 +224,30 @@ class Config(configparser.RawConfigParser):
         return ['export %s="%s"' % (k.upper(), v) for k, v in self.values(*sections)]
 
 
+VAR_LOCK = '/var/lock'
+
+
+def make_lock(fname, timeout=0):
+    """Return a LockFile for `fname`, in an appropriate location.
+    """
+    # Don't put the lock file next to the file to be locked, since that
+    # filesystem might not be as functional as we need it to be
+    lockbase = VAR_LOCK if os.path.exists(VAR_LOCK) else tempfile.gettempdir()
+    lockdir = os.path.join(lockbase, 'dkconfig')
+    try:
+        os.makedirs(lockdir)
+    except os.error as e:
+        if not os.path.exists(lockdir):
+            lockdir = lockbase
+    
+    lock_fname = os.path.join(lockdir, os.path.basename(fname))
+    return LockFile(lock_fname, timeout=timeout)
+
+
 @contextmanager
 def parser(fname):
     cp = Config()
-    lock = LockFile(fname + '.lock', timeout=2)
-    with lock:
+    with make_lock(fname, timeout=7):
         try:
             cp.read(fname)
         except IOError as e:
@@ -196,85 +258,112 @@ def parser(fname):
         cp.write(open(fname, 'w'))
 
 
-def config(filename, command='cat', flags=(), *args):
-    "Main entry point for this module."
-    if '--debug' in flags:
-        print("\n==> CONFIG:", filename, command, args, '\n')
-    args = [arg for arg in args if not arg.startswith('-')]
-    if command == 'cat':
-        # a+ -> read + create if not exist
-        print(open(filename, 'a+').read())
-        return 0
+def run(cmdline=None):
+    """`run()` is the most convenient entry point for usage as a Python
+       library::
 
-    with parser(filename) as p:
-        cmd = getattr(p, command)
-        res = cmd(*args)
-        _printres(res)
-        return p.exit
+           import dkconfig
+           txt = dkconfig.run('foo.ini values')
+           val = dkconfig.run('foo.ini get key')
 
+       `run` does not call `sys.exit`.
 
-def piped_input():
-    "Do we have piped input?"
-    if sys.platform == 'win32':
-        return []
-    return []       # TODO: find a way to use both py.test capsys and select on sys.stdin..
-    import select
+       The commands can be meta-commands (commands about dkconfig, not
+       an ini file).::
 
-    ready, _, _ = select.select([sys.stdin], [], [], 0)
-    if ready:
-        return [line.strip() for line in sys.stdin.readlines()]
-    return []
+          dkconfig meta-command [args*] --flags
 
+       e.g.::
 
-def parse_commandline(arguments=None):
-    """[prog] [glob/filename] cmd args* [--flags]
-       ... | [prog] cmd args* [--flags]
+          dkconfig help
+          dkconfig help cmd
+
+          dkconfig [glob/filename] cmd args* [--flags]
+
+       i.e. dkconfig followed by a glob matchine one or more ini files, followed
+       by a command and arguments to the command as specified in the docs (and
+       any flags).
+
+       .. TODO:: dkconfig should also be able to take file names from stdin
+       
+       ::
+          <other-prog> | dkconfig cmd args* [--flags]
+
+       this would let you quickly access common properties, e.g.::
+
+          $ find www/ -maxdepth 2 -name "*.ini" -print | dkconfig - get site dns
+          www.example.com
+          www.example2.com
+          ...
+       
     """
-    if arguments is None:
-        arguments = sys.argv[1:]
-    progargs = [a for a in arguments if not a.startswith('-')]
-    progflags = [f for f in arguments if f.startswith('-')]
-    if '--version' in progflags:
-        from .version import __version__
-        print(__version__)
+    params = cmdline.split() if isinstance(cmdline, basestring) else sys.argv[1:]
+    p = argparse.ArgumentParser(description="Command line interface to ConfigParser")
+    p.add_argument('filename', nargs='?')
+    p.add_argument('command')
+    p.add_argument('--version', action='store_true')
+    p.add_argument('-d', '--debug', action='store_true')
+    
+    args, unparsed = p.parse_known_args(params)
+    
+    if args.filename:
+        # expand globs, but be careful so we can still create new files.
+        #  Namespace(filename='*.ini', ...)
+        #  Namespace(filename='foo.ini', ...)
+        #  Namespace(filename='does-not-exist.ini', ...)
+        args.filename = glob.glob(args.filename) or [args.filename]
+
+    available_commands = Config().commands
+
+    if not args.filename and args.command not in available_commands:
+        # Namespace(filename=None, command='foo.ini')
+        args.filename = [args.command]
+        args.command = 'cat'
+
+    if args.filename == ['help']:
+        # Namespace(filename=['help'], command='values')
+        args.filename = []
+        unparsed.insert(0, args.command)
+        args.command = 'help'
+
+    assert args.command in available_commands
+    
+    if args.debug:
+        print("ARGS:", args, unparsed, file=sys.stderr)
         sys.exit(0)
+
+    def parse_kwarg(txt):
+        m = re.match(r'--?(?P<key>\w+)(:=(?P<val>.*))', txt)
+        if m:
+            g = m.groupdict()
+            return g['key'], g['val']
+
+    def call_config(cp):
+        try:
+            cmd = getattr(cp, args.command)
+        except:
+            print('error:', cp, args)
+            raise
+        remaining_opts = [p for p in unparsed if p.startswith('-')]
+        kwargs = dict(filter(None, map(parse_kwarg, remaining_opts)))
+        res = cmd(*unparsed, **kwargs)
+        format_result(res)
+        return cp.exit
         
-    argcount = len(progargs)
-
-    def getarg(n, default=None):
-        if n < argcount:
-            return progargs[n]
-        return default
-
-    # find . -name "*.ini" -print | config - values
-    fnames = piped_input()
-    if not (progargs or fnames):
-        # nothing to do
-        print(__doc__)
-        sys.exit(0)
-
-    if fnames:
-        command = getarg(0, 'cat')
-        args = progargs[1:]
+    if not args.filename:
+        return call_config(Config())
     else:
-        fnames = glob.glob(progargs[0])
-        if not fnames:
-            with open(progargs[0], 'a+'): pass
-            fnames = [progargs[0]]
-        command = getarg(1, 'cat')
-        args = progargs[2:]
-
-    return fnames, command, args, progflags
+        retcode = 0
+        for fname in args.filename:
+            with parser(fname) as p:
+                retcode += call_config(p)
+        return retcode > 0
 
 
 def main(cmdline=None):
-    params = cmdline.split() if isinstance(cmdline, basestring) else sys.argv[1:]
-    fnames, command, args, flags = parse_commandline(params)
-    retcode = 0
-
-    for fname in fnames:
-        retcode += config(fname, command, flags, *args)
-
+    """`main()` is the entry point for the dkconfig command line tool.
+    """
+    retcode = run(cmdline)
     sys.exit(retcode)
 
 
