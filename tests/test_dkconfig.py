@@ -1,5 +1,5 @@
 import pytest
-from mock import MagicMock, Mock
+from mock import MagicMock
 import sys
 from dkconfig import main, dkconfig
 
@@ -11,12 +11,15 @@ def sysexit(monkeypatch):
     return mock_exit
 
 
-def test_debug(sysexit, capsys):
-    main("foo.ini get header key -d")
-    #sysexit.assert_called_with(0)
+def test_debug(tmpdir, sysexit, capsys):
+    file = tmpdir.join("foo.ini")
+    main("%s get header key -d" % file)
+    sysexit.assert_called_with(1)
     out, err = capsys.readouterr()
-    print err[50:]
-    assert err == """ARGS: Namespace(command='get', debug=True, filename=['foo.ini'], version=False) ['header', 'key']\n"""
+    err = err.replace('\\', '')
+    file = str(file).replace('\\','')
+    compare = """ARGS: Namespace(command='get', debug=True, filename=['%s'], version=False) ['header', 'key']\n""" % file
+    assert err == compare
     
 
 def test_create_file(tmpdir, sysexit):
