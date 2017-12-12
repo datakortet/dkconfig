@@ -2,29 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5a06f5ac-c9a6-4c75-b3d3-132bc2cec593" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/dkbuild.ini" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dkconfig/_version.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/docs/_static/empty.txt" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/docs/dkconfig.rst" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/docs/modules.rst" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/requirements-dev.txt" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/tasks.py" />
-      <change beforePath="$PROJECT_DIR$/.bumpversion.cfg" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/dkconfig.iml" afterPath="$PROJECT_DIR$/.idea/dkconfig.iml" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/.travis.yml" afterPath="$PROJECT_DIR$/.travis.yml" />
-      <change beforePath="$PROJECT_DIR$/README.rst" afterPath="$PROJECT_DIR$/README.rst" />
-      <change beforePath="$PROJECT_DIR$/dkconfig/__init__.py" afterPath="$PROJECT_DIR$/dkconfig/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/dkconfig/dkconfig.py" afterPath="$PROJECT_DIR$/dkconfig/dkconfig.py" />
-      <change beforePath="$PROJECT_DIR$/dkconfig/version.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/docs/conf.py" afterPath="$PROJECT_DIR$/docs/conf.py" />
-      <change beforePath="$PROJECT_DIR$/docs/index.rst" afterPath="$PROJECT_DIR$/docs/index.rst" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" afterPath="$PROJECT_DIR$/requirements.txt" />
-      <change beforePath="$PROJECT_DIR$/runtests.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/setup.py" afterPath="$PROJECT_DIR$/setup.py" />
-      <change beforePath="$PROJECT_DIR$/tests/test_dkconfig.py" afterPath="$PROJECT_DIR$/tests/test_dkconfig.py" />
-      <change beforePath="$PROJECT_DIR$/tox.ini" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/tests/test_import_dkconfig.py" afterPath="$PROJECT_DIR$/tests/test_import_dkconfig.py" />
     </list>
     <ignored path="dkconfig.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -196,12 +175,24 @@
                   </provider>
                 </entry>
               </file>
-              <file leaf-file-name=".travis.yml" pinned="false" current-in-tab="true">
+              <file leaf-file-name=".travis.yml" pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/.travis.yml">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="304">
-                      <caret line="19" column="0" lean-forward="true" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+                    <state relative-caret-position="192">
+                      <caret line="12" column="35" lean-forward="false" selection-start-line="12" selection-start-column="35" selection-end-line="12" selection-end-column="35" />
                       <folding />
+                    </state>
+                  </provider>
+                </entry>
+              </file>
+              <file leaf-file-name="test_import_dkconfig.py" pinned="false" current-in-tab="true">
+                <entry file="file://$PROJECT_DIR$/tests/test_import_dkconfig.py">
+                  <provider selected="true" editor-type-id="text-editor">
+                    <state relative-caret-position="128">
+                      <caret line="8" column="21" lean-forward="false" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
+                      <folding>
+                        <element signature="e#24#39#0" expanded="true" />
+                      </folding>
                     </state>
                   </provider>
                 </entry>
@@ -287,10 +278,10 @@
                   <file leaf-file-name="test_dkconfig.py" pinned="false" current-in-tab="false">
                     <entry file="file://$PROJECT_DIR$/tests/test_dkconfig.py">
                       <provider selected="true" editor-type-id="text-editor">
-                        <state relative-caret-position="736">
-                          <caret line="48" column="15" lean-forward="false" selection-start-line="48" selection-start-column="15" selection-end-line="48" selection-end-column="15" />
+                        <state relative-caret-position="496">
+                          <caret line="42" column="15" lean-forward="false" selection-start-line="42" selection-start-column="15" selection-end-line="42" selection-end-column="15" />
                           <folding>
-                            <element signature="e#0#9#0" expanded="true" />
+                            <marker date="1513122476810" expanded="true" signature="10:17" ph="import ..." />
                           </folding>
                         </state>
                       </provider>
@@ -354,9 +345,10 @@
         <option value="$PROJECT_DIR$/docs/index.rst" />
         <option value="$PROJECT_DIR$/docs/conf.py" />
         <option value="$PROJECT_DIR$/README.rst" />
-        <option value="$PROJECT_DIR$/.travis.yml" />
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/requirements-dev.txt" />
+        <option value="$PROJECT_DIR$/.travis.yml" />
+        <option value="$PROJECT_DIR$/tests/test_import_dkconfig.py" />
       </list>
     </option>
   </component>
@@ -832,6 +824,21 @@
       <option name="presentableId" value="Default" />
       <updated>1417300988697</updated>
     </task>
+    <task id="LOCAL-00001" summary="- update docs&#10;- 100% test coverage&#10;- use dk-tasklib instead of bumpversion">
+      <created>1513122289435</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1513122289436</updated>
+    </task>
+    <task id="LOCAL-00002" summary="we need the dev requirements too..">
+      <created>1513122596095</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1513122596095</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -868,6 +875,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32942328" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32777232" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -913,27 +921,20 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="- update docs&#10;- 100% test coverage&#10;- use dk-tasklib instead of bumpversion" />
-    <option name="LAST_COMMIT_MESSAGE" value="- update docs&#10;- 100% test coverage&#10;- use dk-tasklib instead of bumpversion" />
+    <MESSAGE value="we need the dev requirements too.." />
+    <option name="LAST_COMMIT_MESSAGE" value="we need the dev requirements too.." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/dkconfig/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="16">
-          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/test_dkconfig.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1552">
           <caret line="100" column="0" lean-forward="false" selection-start-line="100" selection-start-column="0" selection-end-line="100" selection-end-column="0" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <marker date="1513122476810" expanded="true" signature="10:17" ph="import ..." />
           </folding>
         </state>
       </provider>
@@ -971,7 +972,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <marker date="1513122476810" expanded="true" signature="10:17" ph="import ..." />
           </folding>
         </state>
       </provider>
@@ -1041,7 +1042,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <marker date="1513122476810" expanded="true" signature="10:17" ph="import ..." />
           </folding>
         </state>
       </provider>
@@ -1111,7 +1112,7 @@
         <state relative-caret-position="0">
           <caret line="100" column="0" lean-forward="false" selection-start-line="100" selection-start-column="0" selection-end-line="100" selection-end-column="0" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <marker date="1513122476810" expanded="true" signature="10:17" ph="import ..." />
           </folding>
         </state>
       </provider>
@@ -1247,10 +1248,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/test_dkconfig.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="736">
-          <caret line="48" column="15" lean-forward="false" selection-start-line="48" selection-start-column="15" selection-end-line="48" selection-end-column="15" />
+        <state relative-caret-position="496">
+          <caret line="42" column="15" lean-forward="false" selection-start-line="42" selection-start-column="15" selection-end-line="42" selection-end-column="15" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <marker date="1513122476810" expanded="true" signature="10:17" ph="import ..." />
           </folding>
         </state>
       </provider>
@@ -1349,9 +1350,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/.travis.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="19" column="0" lean-forward="true" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+        <state relative-caret-position="192">
+          <caret line="12" column="35" lean-forward="false" selection-start-line="12" selection-start-column="35" selection-end-line="12" selection-end-column="35" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/test_import_dkconfig.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="8" column="21" lean-forward="false" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
+          <folding>
+            <element signature="e#24#39#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
