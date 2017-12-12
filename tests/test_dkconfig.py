@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import pytest
 from mock import MagicMock
@@ -145,6 +146,6 @@ def test_help_command(tmpdir, sysexit, capsys):
     main("help values")
     sysexit.assert_called_with(0)
     out, err = capsys.readouterr()
-    print 'out:', repr(out)
-    print 'docstring', repr(dkconfig.Config.values.__doc__)
+    print('out:', repr(out))
+    print('docstring', repr(dkconfig.Config.values.__doc__))
     assert dkconfig.Config.values.__doc__ in out
