@@ -12,12 +12,15 @@ def sysexit(monkeypatch):
     return mock_exit
 
 
-def test_debug(sysexit, capsys):
-    main("foo.ini get header key -d")
-    #sysexit.assert_called_with(0)
+def test_debug(tmpdir, sysexit, capsys):
+    file = tmpdir.join("foo.ini")
+    main("%s get header key -d" % file)
+    sysexit.assert_called_with(1)
     out, err = capsys.readouterr()
-    print err[50:]
-    assert err == """ARGS: Namespace(command='get', debug=True, filename=['foo.ini']) ['header', 'key']\n"""
+    err = err.replace('\\', '')
+    file = str(file).replace('\\','')
+    compare = """ARGS: Namespace(command='get', debug=True, filename=['%s']) ['header', 'key']\n""" % file
+    assert err == compare
     
 
 def test_file_error(tmpdir):
