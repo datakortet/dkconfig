@@ -1,5 +1,6 @@
+import os
 import pytest
-from mock import MagicMock, Mock
+from mock import MagicMock
 import sys
 from dkconfig import main, dkconfig
 
@@ -16,8 +17,15 @@ def test_debug(sysexit, capsys):
     #sysexit.assert_called_with(0)
     out, err = capsys.readouterr()
     print err[50:]
-    assert err == """ARGS: Namespace(command='get', debug=True, filename=['foo.ini'], version=False) ['header', 'key']\n"""
+    assert err == """ARGS: Namespace(command='get', debug=True, filename=['foo.ini']) ['header', 'key']\n"""
     
+
+def test_file_error(tmpdir):
+    amadir = tmpdir.join('i-am-a-dir.ini')
+    os.makedirs(str(amadir))
+    with pytest.raises(IOError):
+        main("%s set header key value" % amadir)
+
 
 def test_create_file(tmpdir, sysexit):
     assert len(tmpdir.listdir()) == 0
@@ -29,6 +37,15 @@ def test_create_file(tmpdir, sysexit):
 
 def test_set_get_value(tmpdir, sysexit, capsys):
     main("%s set header key value" % tmpdir.join("foo.ini"))
+    main("%s get header key" % tmpdir.join("foo.ini"))
+    sysexit.assert_called_with(0)
+    out, err = capsys.readouterr()
+    assert out.strip() == 'value'
+
+
+def test_set_get_value2(tmpdir, sysexit, capsys):
+    main("%s set header --key:=value" % tmpdir.join("foo.ini"))
+    # print(tmpdir.join('foo.ini').read())
     main("%s get header key" % tmpdir.join("foo.ini"))
     sysexit.assert_called_with(0)
     out, err = capsys.readouterr()

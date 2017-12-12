@@ -1,16 +1,6 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-import inspect
-import sys
-import glob
-import tempfile
-import os
-import re
-import argparse
-
-
-__doc__ = """
+"""
 Basic usage
 -----------
 Most of the methods of ConfigParser
@@ -64,8 +54,8 @@ eval::
 
 You can read values directly into dos variables in the regular way::
 
-    /tst> for /f "delims=" %a in ('dkconfig foo.ini get header key') do @set KEY=%a
-    /tst> echo %KEY%
+    > for /f "delims=" %a in ('dkconfig foo.ini get header key') do @set KEY=%a
+    > echo %KEY%
     value
 
 Bash has a more sane syntax for this::
@@ -85,32 +75,49 @@ The appropriate error returns are set if a key is missing::
     /tst> echo %ERRORLEVEL%
     0
 """
-try:
-    import ConfigParser as configparser
-except ImportError:  # pragma: no cover
-    import configparser
+from __future__ import print_function
+from ._version import __version__
+import inspect
+import sys
+import glob
+import tempfile
+import os
+import re
+import argparse
+try:  # pragma: nocover
+    import ConfigParser as configparser  # pylint:disable=import-error
+except ImportError:  # pragma: nocover
+    import configparser  # pylint:disable=import-error
 from contextlib import contextmanager
 from lockfile import LockFile
 
 
 def _is_items(lst):
+    """Is ``lst`` an items list?
+    """
     try:
-        return [(a,b) for a,b in lst]
+        return [(a, b) for a, b in lst]
     except ValueError:
         return False
 
+
 def _is_iter(lst):
+    """Is ``lst`` an iterator?
+    """
     try:
         return list(lst)
-    except:
+    except:  # pragma: nocover
         return False
 
 
 def format_items(items):
+    """Print items formatted in two columns.
+    """
     keylen = max(len(k) for k, v in items)
     for k, v in items:
         print(k.ljust(keylen), '=>', v)
-    
+
+
 def format_list(lst):
     for item in lst:
         print(item)
@@ -122,16 +129,17 @@ def format_result(val):
 
     if isinstance(val, (int, float, str, unicode)):
         return print(val)
-    
+
     items = _is_items(val)
     if items:
         return format_items(items)
-    
+
     lst = _is_iter(val)
     if lst:
         return format_list(lst)
-        
-    print(val)
+
+    # mystery item
+    print(val)  # pragma: nocover
 
 
 class Config(configparser.RawConfigParser):
@@ -144,7 +152,7 @@ class Config(configparser.RawConfigParser):
                 if name != 'commands' and not name.startswith('_')
                 and inspect.ismethod(getattr(self, name))]
 
-    def help(self, cmdname=None, **kw):
+    def help(self, cmdname=None):
         """List all commands, or help foo to get help on foo.
         """
         cmds = self.commands
@@ -161,7 +169,8 @@ class Config(configparser.RawConfigParser):
             """''' % (firstline.strip(), docstring)
 
     def cat(self):
-        "Output the contents to stdout."
+        """Output the contents to stdout.
+        """
         self.write(sys.stdout)
 
     def read(self, fname, *args, **kw):
@@ -169,7 +178,8 @@ class Config(configparser.RawConfigParser):
         return configparser.RawConfigParser.read(self, fname, *args, **kw)
 
     def add_section(self, section):
-        "Silently accept existing sections."
+        """Silently accept existing sections.
+        """
         try:
             # super(Config, self).add_section(section)
             # ConfigParser is an old style class (can't use super)
@@ -178,14 +188,15 @@ class Config(configparser.RawConfigParser):
             pass
 
     def get(self, section, option):
-        "Get an option from a section (returns None if it can't find it)."
+        """Get an option from a section (returns None if it can't find it).
+        """
         try:
             return configparser.RawConfigParser.get(self, section, option)
         except (configparser.NoSectionError, configparser.NoOptionError):
             self.exit = 1
             return None
 
-    def set(self, section, option, value):
+    def set(self, section, option, value=None):
         """Set an option in a section (creates the section if it doesn't exist.
         """
         if not self.has_section(section):
@@ -193,13 +204,16 @@ class Config(configparser.RawConfigParser):
         return configparser.RawConfigParser.set(self, section, option, value)
 
     def setlist(self, section, key, *lst):
+        """Set a list value.
+        """
         if not self.has_section(section):
             self.add_section(section)
         listval = '\n'.join([str(item) for item in lst])
         configparser.RawConfigParser.set(self, section, key, listval)
 
     def values(self, *sections):
-        "Return all values in the config file."
+        """Return all values in the config file.
+        """
         res = []
         sections = sections or self.sections()
         for sect in sections:
@@ -207,9 +221,12 @@ class Config(configparser.RawConfigParser):
         return res
 
     def dos(self, *sections):
-        "Return values as dos set statements."
+        """Return values as dos set statements.
+        """
 
         def convert_val(v):
+            """Converts from ini-style paths to .bat-style paths.
+            """
             m = re.match(r'\w:(?:/[^/]*)*', v)
             if m:
                 # it's a path
@@ -220,8 +237,10 @@ class Config(configparser.RawConfigParser):
                 for k, v in self.values(*sections)]
 
     def bash(self, *sections):
-        "Return values as bash export statements."
-        return ['export %s="%s"' % (k.upper(), v) for k, v in self.values(*sections)]
+        """Return values as bash export statements.
+        """
+        return ['export %s="%s"' % (k.upper(), v)
+                for k, v in self.values(*sections)]
 
 
 VAR_LOCK = '/var/lock'
@@ -236,10 +255,10 @@ def make_lock(fname, timeout=0):
     lockdir = os.path.join(lockbase, 'dkconfig')
     try:
         os.makedirs(lockdir)
-    except os.error as e:
+    except os.error:
         if not os.path.exists(lockdir):
-            lockdir = lockbase
-    
+            lockdir = lockbase  # pragma: nocover
+
     lock_fname = os.path.join(lockdir, os.path.basename(fname))
     return LockFile(lock_fname, timeout=timeout)
 
@@ -280,32 +299,36 @@ def run(cmdline=None):
 
           dkconfig [glob/filename] cmd args* [--flags]
 
-       i.e. dkconfig followed by a glob matchine one or more ini files, followed
-       by a command and arguments to the command as specified in the docs (and
-       any flags).
+       i.e. dkconfig followed by a glob matchine one or more ini files,
+       followed by a command and arguments to the command as specified in the
+       docs (and any flags).
 
        .. TODO:: dkconfig should also be able to take file names from stdin
-       
+
        ::
           <other-prog> | dkconfig cmd args* [--flags]
 
        this would let you quickly access common properties, e.g.::
 
-          $ find www/ -maxdepth 2 -name "*.ini" -print | dkconfig - get site dns
+          $ find . -maxdepth 2 -name "*.ini" -print | dkconfig - get site dns
           www.example.com
           www.example2.com
           ...
-       
+
     """
-    params = cmdline.split() if isinstance(cmdline, basestring) else sys.argv[1:]
-    p = argparse.ArgumentParser(description="Command line interface to ConfigParser")
+    string_cmdline = isinstance(cmdline, basestring)
+    params = cmdline.split() if string_cmdline else sys.argv[1:]
+    p = argparse.ArgumentParser(
+        description="Command line interface to ConfigParser"
+    )
     p.add_argument('filename', nargs='?')
     p.add_argument('command')
-    p.add_argument('--version', action='store_true')
+    p.add_argument('--version', action='version',
+                   version='%(prog)s ' + __version__)
     p.add_argument('-d', '--debug', action='store_true')
-    
+
     args, unparsed = p.parse_known_args(params)
-    
+
     if args.filename:
         # expand globs, but be careful so we can still create new files.
         #  Namespace(filename='*.ini', ...)
@@ -327,7 +350,7 @@ def run(cmdline=None):
         args.command = 'help'
 
     assert args.command in available_commands
-    
+
     if args.debug:
         print("ARGS:", args, unparsed, file=sys.stderr)
         sys.exit(0)
@@ -341,15 +364,18 @@ def run(cmdline=None):
     def call_config(cp):
         try:
             cmd = getattr(cp, args.command)
-        except:
+        except:  # pragma: nocover
             print('error:', cp, args)
             raise
-        remaining_opts = [p for p in unparsed if p.startswith('-')]
-        kwargs = dict(filter(None, map(parse_kwarg, remaining_opts)))
-        res = cmd(*unparsed, **kwargs)
+        remaining_opts = [param for param in unparsed if param.startswith('-')]
+        pos_opts = [param for param in unparsed if not param.startswith('-')]
+        for item in [parse_kwarg(opt) for opt in remaining_opts]:
+            if item:
+                pos_opts += item
+        res = cmd(*pos_opts)
         format_result(res)
         return cp.exit
-        
+
     if not args.filename:
         return call_config(Config())
     else:
@@ -367,5 +393,5 @@ def main(cmdline=None):
     sys.exit(retcode)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: nocover
     main(sys.argv[1:])
