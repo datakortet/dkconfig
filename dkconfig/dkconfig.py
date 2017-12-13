@@ -94,6 +94,7 @@ try:  # pragma: nocover
     basestring
 except NameError:
     basestring = (str, bytes)
+    unicode = str
 
 
 def _is_items(lst):
