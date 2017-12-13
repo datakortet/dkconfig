@@ -19,7 +19,6 @@ dkconfig -- command line access to ConfigParser
 Installing from PyPI
 --------------------
 
-This is what you want if you just want to use dkconfig:
 
    pip install dkconfig
 
@@ -97,3 +96,4 @@ The appropriate error returns are set if a key is missing::
     value
     /tst> echo %ERRORLEVEL%
     0
+

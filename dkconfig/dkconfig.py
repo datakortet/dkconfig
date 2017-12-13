@@ -90,6 +90,10 @@ except ImportError:  # pragma: nocover
     import configparser  # pylint:disable=import-error
 from contextlib import contextmanager
 from lockfile import LockFile
+try:  # pragma: nocover
+    basestring
+except NameError:
+    basestring = (str, bytes)
 
 
 def _is_items(lst):

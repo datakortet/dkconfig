@@ -4,4 +4,7 @@
     <option name="state" value="https://github.com/datakortet/dkconfig.git" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 2.7 (dkconfig)" project-jdk-type="Python SDK" />
+  <component name="PythonCompatibilityInspectionAdvertiser">
+    <option name="version" value="2" />
+  </component>
 </project>
