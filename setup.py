@@ -11,6 +11,10 @@ License :: OSI Approved :: MIT License
 Programming Language :: Python
 Programming Language :: Python :: 2
 Programming Language :: Python :: 2.7
+Programming Language :: Python :: 3
+Programming Language :: Python :: 3.4
+Programming Language :: Python :: 3.5
+Programming Language :: Python :: 3.6
 Topic :: Software Development :: Libraries
 """
 import sys
@@ -18,7 +22,7 @@ import setuptools
 from distutils.core import setup, Command
 from setuptools.command.test import test as TestCommand
 
-version = '0.1.4'
+version = '0.2.0'
 
 
 class PyTest(TestCommand):
