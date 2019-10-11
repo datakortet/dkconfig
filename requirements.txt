@@ -1,2 +1,3 @@
 # from setup.py
 lockfile>=0.10.2
+mock==2.0.0
