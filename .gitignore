@@ -406,3 +406,4 @@ pip-selfcheck.json
 
 /foo.ini
 /tests/foo.ini
+dkconfig.dot  
