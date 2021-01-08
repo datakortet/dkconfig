@@ -18,10 +18,18 @@ def test_debug(tmpdir, sysexit, capsys):
     main("%s get header key -d" % file)
     sysexit.assert_called_with(1)
     out, err = capsys.readouterr()
-    err = err.replace('\\', '')
+    err = err.replace('\\', '').strip()
     file = str(file).replace('\\','')
-    compare = """ARGS: Namespace(command='get', debug=True, filename=['%s']) ['header', 'key']\n""" % file
-    assert err == compare
+    # compare = """ARGS: Namespace(command='get', debug=True, filename=['%s']) ['header', 'key']""" % file
+    # py39 = """ARGS: Namespace(filename=['%s'], command='get', debug=True) ['header', 'key']""" % file
+    assert err.endswith(" ['header', 'key']")
+    err = err[:-len(" ['header', 'key']")]
+    assert err.startswith("ARGS: ")
+    err = err[len("ARGS: "):]
+    errdict = eval(err, {"Namespace": dict})  # should be valid Python by now, convert Namespace to dict
+    assert errdict['command'] == 'get'
+    assert errdict['debug'] is True
+    assert errdict['filename'] == [file]
     
 
 def test_file_error(tmpdir):
