@@ -76,7 +76,6 @@ The appropriate error returns are set if a key is missing::
     0
 """
 from __future__ import print_function
-from ._version import __version__
 import inspect
 import sys
 import glob
@@ -84,12 +83,13 @@ import tempfile
 import os
 import re
 import argparse
+from contextlib import contextmanager
+from lockfile import LockFile
+from ._version import __version__
 try:  # pragma: nocover
     import ConfigParser as configparser  # pylint:disable=import-error
 except ImportError:  # pragma: nocover
     import configparser  # pylint:disable=import-error
-from contextlib import contextmanager
-from lockfile import LockFile
 try:  # pragma: nocover
     basestring
 except NameError:
@@ -124,11 +124,15 @@ def format_items(items):
 
 
 def format_list(lst):
+    """Print one item per line.
+    """
     for item in lst:
         print(item)
 
 
 def format_result(val):
+    """Pretty print val.
+    """
     if not val:
         return print("")
 
@@ -145,17 +149,27 @@ def format_result(val):
 
     # mystery item
     print(val)  # pragma: nocover
+    return None
 
 
-class Config(configparser.RawConfigParser):
+class Config(configparser.RawConfigParser):  # pylint:disable=too-many-ancestors
+    """CLI Interface to configparser.
+    """
     exit = 0
     _meta_commands = ['help']
 
     @property
     def commands(self):
-        return [name for name in dir(self)
-                if name != 'commands' and not name.startswith('_')
-                and inspect.ismethod(getattr(self, name))]
+        """Return all methods defined as self as a list.
+        """
+        def _ismethod(m):
+            return inspect.ismethod(getattr(self, m))
+        
+        res = []
+        for n in dir(self):
+            if n != 'commands' and not n.startswith('_') and _ismethod(n):
+                res.append(n)
+        return res
 
     def help(self, cmdname=None):
         """List all commands, or help foo to get help on foo.
@@ -178,7 +192,7 @@ class Config(configparser.RawConfigParser):
         """
         self.write(sys.stdout)
 
-    def read(self, fname, *args, **kw):
+    def read(self, fname, *args, **kw):  # pylint:disable=arguments-differ
         open(fname, 'a+').close()  # create file if it doesn't exist.
         return configparser.RawConfigParser.read(self, fname, *args, **kw)
 
@@ -192,7 +206,7 @@ class Config(configparser.RawConfigParser):
         except configparser.DuplicateSectionError:
             pass
 
-    def get(self, section, option):
+    def get(self, section, option):  # pylint:disable=arguments-differ
         """Get an option from a section (returns None if it can't find it).
         """
         try:
@@ -216,7 +230,7 @@ class Config(configparser.RawConfigParser):
         listval = '\n'.join([str(item) for item in lst])
         configparser.RawConfigParser.set(self, section, key, listval)
 
-    def values(self, *sections):
+    def values(self, *sections):  # pylint:disable=arguments-differ
         """Return all values in the config file.
         """
         res = []
@@ -270,6 +284,8 @@ def make_lock(fname, timeout=0):
 
 @contextmanager
 def parser(fname):
+    """Context manager that provides locking semantics.
+    """
     cp = Config()
     with make_lock(fname, timeout=7):
         try:
@@ -361,12 +377,17 @@ def run(cmdline=None):
         sys.exit(0)
 
     def parse_kwarg(txt):
+        """Parse command line flags.
+        """
         m = re.match(r'--?(?P<key>\w+)(:=(?P<val>.*))', txt)
         if m:
             g = m.groupdict()
             return g['key'], g['val']
+        return None
 
     def call_config(cp):
+        """Call config command specified in args.command.
+        """
         try:
             cmd = getattr(cp, args.command)
         except:  # pragma: nocover
@@ -383,12 +404,12 @@ def run(cmdline=None):
 
     if not args.filename:
         return call_config(Config())
-    else:
-        retcode = 0
-        for fname in args.filename:
-            with parser(fname) as p:
-                retcode += call_config(p)
-        return retcode > 0
+
+    retcode = 0
+    for fname in args.filename:
+        with parser(fname) as p:
+            retcode += call_config(p)
+    return retcode > 0
 
 
 def main(cmdline=None):
