@@ -1,9 +1,6 @@
 
 .. include:: ../README.rst
 
-.. include:: ../DEVELOP.rst
-
-
 Contents:
 
 .. toctree::
