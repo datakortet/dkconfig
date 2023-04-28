@@ -7,7 +7,9 @@
    :target: https://readthedocs.org/projects/dkconfig/?badge=latest
    :alt: Documentation Status
 
-
+.. image:: https://codecov.io/gh/datakortet/dkconfig/branch/master/graph/badge.svg?token=EEyMx6KE7e
+    :target: https://codecov.io/gh/datakortet/dkconfig
+    :alt: Code Coverage
 
 dkconfig -- command line access to ConfigParser
 ==================================================
