@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import pytest
 from mock import MagicMock
@@ -11,6 +10,48 @@ def sysexit(monkeypatch):
     mock_exit = MagicMock()
     monkeypatch.setattr(sys, 'exit', mock_exit)
     return mock_exit
+
+
+def test_is_functions():
+    assert dkconfig._is_items({'a': 1, 'b': 2, 'c': 3}.items())
+    assert not dkconfig._is_items(42)
+
+    assert dkconfig._is_iter(['a', 'b', 'c'])
+    assert dkconfig._is_iter((1, 2, 3))
+    assert not dkconfig._is_iter(42)
+
+
+def test_format_result(capsys):
+    dkconfig.format_result(None)
+    out, err = capsys.readouterr()
+    assert out.strip() == ""
+
+    dkconfig.format_result(42)
+    out, err = capsys.readouterr()
+    assert out.strip() == "42"
+
+    dkconfig.format_result({'a': 1, 'b': 2, 'c': 3}.items())
+    out, err = capsys.readouterr()
+    assert out.strip() == "a => 1\nb => 2\nc => 3"
+
+    dkconfig.format_result(['a', 'b', 'c'])
+    out, err = capsys.readouterr()
+    assert out.strip() == "a\nb\nc"
+
+    dkconfig.format_result(4+3j)
+    out, err = capsys.readouterr()
+    assert out.strip() == "(4+3j)"
+
+
+def test_parse_kwarg():
+    assert dkconfig.run('help -42') == 0
+
+    with pytest.raises(AssertionError):
+        dkconfig.run('foo -42')
+
+    # assert dkconfig.run('-- foo')
+    # with pytest.raises():
+    #     dkconfig.run('help -42', debug=True)
 
 
 def test_debug(tmpdir, sysexit, capsys):

@@ -95,7 +95,7 @@ def _is_items(lst):
     try:
         res = list(lst)
         return False if any(len(item) != 2 for item in res) else res
-    except ValueError:
+    except (ValueError, TypeError):
         return False
 
 
@@ -383,7 +383,7 @@ def run(cmdline=None):
         """
         try:
             cmd = getattr(cp, args.command)
-        except:  # noqa: E722
+        except Exception:  # pragma: nocover
             print('error:', cp, args)
             raise
         remaining_opts = [param for param in unparsed if param.startswith('-')]
