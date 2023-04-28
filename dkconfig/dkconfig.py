@@ -87,7 +87,6 @@ from ._version import __version__
 import configparser
 
 
-
 def _is_items(lst):
     """Is ``lst`` an items list?
     """
@@ -102,7 +101,7 @@ def _is_iter(lst):
     """
     try:
         return list(lst)
-    except:  # pragma: nocover
+    except:  # noqa
         return False
 
 
@@ -143,7 +142,7 @@ def format_result(val):
     return None
 
 
-class Config(configparser.RawConfigParser):  # pylint:disable=too-many-ancestors
+class Config(configparser.RawConfigParser):
     """CLI Interface to configparser.
     """
     exit = 0
@@ -155,7 +154,7 @@ class Config(configparser.RawConfigParser):  # pylint:disable=too-many-ancestors
         """
         def _ismethod(m):
             return inspect.ismethod(getattr(self, m))
-        
+
         res = []
         for n in dir(self):
             if n != 'commands' and not n.startswith('_') and _ismethod(n):
@@ -381,7 +380,7 @@ def run(cmdline=None):
         """
         try:
             cmd = getattr(cp, args.command)
-        except:  # pragma: nocover
+        except:  # noqa: E722
             print('error:', cp, args)
             raise
         remaining_opts = [param for param in unparsed if param.startswith('-')]
