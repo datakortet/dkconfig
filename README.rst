@@ -1,4 +1,7 @@
 
+.. image:: https://github.com/datakortet/dkconfig/actions/workflows/ci-cd.yml/badge.svg
+    :target: https://github.com/datakortet/dkconfig/actions/workflows/ci-cd.yml
+    :alt: CI/CD Pipeline
 
 .. image:: https://readthedocs.org/projects/dkconfig/badge/?version=latest
    :target: https://readthedocs.org/projects/dkconfig/?badge=latest
