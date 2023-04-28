@@ -15,7 +15,7 @@ def sysexit(monkeypatch):
 
 def test_debug(tmpdir, sysexit, capsys):
     file = tmpdir.join("foo.ini")
-    main("%s get header key -d" % file)
+    main(f"{file} get header key -d")
     sysexit.assert_called_with(1)
     out, err = capsys.readouterr()
     err = err.replace('\\', '').strip()
@@ -36,20 +36,20 @@ def test_file_error(tmpdir):
     amadir = tmpdir.join('i-am-a-dir.ini')
     os.makedirs(str(amadir))
     with pytest.raises(IOError):
-        main("%s set header key value" % amadir)
+        main(f"{amadir} set header key value")
 
 
 def test_create_file(tmpdir, sysexit):
     assert len(tmpdir.listdir()) == 0
-    main("%s set header key value" % tmpdir.join("foo.ini"))
+    main(f'{tmpdir.join("foo.ini")} set header key value')
     print("DIR:", tmpdir.listdir())
     assert len(tmpdir.listdir()) == 1
     sysexit.assert_called_with(0)
 
 
 def test_set_get_value(tmpdir, sysexit, capsys):
-    main("%s set header key value" % tmpdir.join("foo.ini"))
-    main("%s get header key" % tmpdir.join("foo.ini"))
+    main(f'{tmpdir.join("foo.ini")} set header key value')
+    main(f'{tmpdir.join("foo.ini")} get header key')
     sysexit.assert_called_with(0)
     out, err = capsys.readouterr()
     assert out.strip() == 'value'
@@ -65,8 +65,8 @@ def test_set_get_value2(tmpdir, sysexit, capsys):
 
 
 def test_values(tmpdir, sysexit, capsys):
-    main("%s set header key value" % tmpdir.join("foo.ini"))
-    main("%s values" % tmpdir.join("foo.ini"))
+    main(f'{tmpdir.join("foo.ini")} set header key value')
+    main(f'{tmpdir.join("foo.ini")} values')
     sysexit.assert_called_with(0)
     out, err = capsys.readouterr()
     assert out.strip() == 'key => value'

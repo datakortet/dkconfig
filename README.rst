@@ -1,15 +1,9 @@
 
-.. image:: https://travis-ci.org/datakortet/dkconfig.svg?branch=master
-  :target: https://travis-ci.org/datakortet/dkconfig
 
 .. image:: https://readthedocs.org/projects/dkconfig/badge/?version=latest
    :target: https://readthedocs.org/projects/dkconfig/?badge=latest
    :alt: Documentation Status
 
-
-.. image:: https://coveralls.io/repos/datakortet/dkconfig/badge.png
-   :target: https://coveralls.io/r/datakortet/dkconfig
-   :alt: Coverage Status
 
 
 dkconfig -- command line access to ConfigParser

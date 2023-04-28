@@ -74,24 +74,27 @@ The appropriate error returns are set if a key is missing::
     /tst> echo %ERRORLEVEL%
     0
 """
-import inspect
-import sys
+import argparse
+import configparser
 import glob
-import tempfile
+import inspect
 import os
 import re
-import argparse
+import sys
+import tempfile
 from contextlib import contextmanager
+
 from lockfile import LockFile
+
 from ._version import __version__
-import configparser
 
 
 def _is_items(lst):
     """Is ``lst`` an items list?
     """
     try:
-        return [(a, b) for a, b in lst]
+        res = list(lst)
+        return False if any(len(item) != 2 for item in res) else res
     except ValueError:
         return False
 
@@ -101,7 +104,7 @@ def _is_iter(lst):
     """
     try:
         return list(lst)
-    except:  # noqa
+    except Exception:
         return False
 
 
@@ -171,11 +174,11 @@ class Config(configparser.RawConfigParser):
 
         firstline = inspect.getsourcelines(getattr(self, cmdname))[0][0]
         docstring = inspect.getdoc(getattr(self, cmdname))
-        return '''
-        {}
+        return f'''
+        {firstline.strip()}
             """
-            {}
-            """'''.format(firstline.strip(), docstring)
+            {docstring}
+            """'''
 
     def cat(self):
         """Output the contents to stdout.

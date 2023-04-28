@@ -8,3 +8,6 @@ package:
 
 build:
   venv: dkconfig
+
+requirements:
+  update: manual
