@@ -1,5 +1,4 @@
 #!/usr/local/bin/python
-# -*- coding: utf-8 -*-
 """
 Basic usage
 -----------
@@ -75,7 +74,6 @@ The appropriate error returns are set if a key is missing::
     /tst> echo %ERRORLEVEL%
     0
 """
-from __future__ import print_function
 import inspect
 import sys
 import glob
@@ -175,10 +173,10 @@ class Config(configparser.RawConfigParser):  # pylint:disable=too-many-ancestors
         firstline = inspect.getsourcelines(getattr(self, cmdname))[0][0]
         docstring = inspect.getdoc(getattr(self, cmdname))
         return '''
-        %s
+        {}
             """
-            %s
-            """''' % (firstline.strip(), docstring)
+            {}
+            """'''.format(firstline.strip(), docstring)
 
     def cat(self):
         """Output the contents to stdout.
@@ -283,7 +281,7 @@ def parser(fname):
     with make_lock(fname, timeout=7):
         try:
             cp.read(fname)
-        except IOError as e:
+        except OSError as e:
             # file not found: errno == 2 (it will be created below)
             if e.errno != 2:
                 raise
