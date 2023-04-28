@@ -86,15 +86,8 @@ import argparse
 from contextlib import contextmanager
 from lockfile import LockFile
 from ._version import __version__
-try:  # pragma: nocover
-    import ConfigParser as configparser  # pylint:disable=import-error
-except ImportError:  # pragma: nocover
-    import configparser  # pylint:disable=import-error
-try:  # pragma: nocover
-    basestring
-except NameError:
-    basestring = (str, bytes)
-    unicode = str
+import configparser
+
 
 
 def _is_items(lst):
@@ -136,7 +129,7 @@ def format_result(val):
     if not val:
         return print("")
 
-    if isinstance(val, (int, float, str, unicode)):
+    if isinstance(val, (int, float, str)):
         return print(val)
 
     items = _is_items(val)
@@ -252,13 +245,13 @@ class Config(configparser.RawConfigParser):  # pylint:disable=too-many-ancestors
                 return v.replace('/', '\\')
             return v
 
-        return ['set "%s=%s"' % (k.upper(), convert_val(v))
+        return [f'set "{k.upper()}={convert_val(v)}"'
                 for k, v in self.values(*sections)]
 
     def bash(self, *sections):
         """Return values as bash export statements.
         """
-        return ['export %s="%s"' % (k.upper(), v)
+        return [f'export {k.upper()}="{v}"'
                 for k, v in self.values(*sections)]
 
 
@@ -337,7 +330,7 @@ def run(cmdline=None):
           ...
 
     """
-    string_cmdline = isinstance(cmdline, basestring)
+    string_cmdline = isinstance(cmdline, str)
     params = cmdline.split() if string_cmdline else sys.argv[1:]
     p = argparse.ArgumentParser(
         description="Command line interface to ConfigParser"
